@@ -110,10 +110,12 @@ static js_value_t *ltx2_create_context (js_env_t *env,
   char *backend    = prop_string(env, opts, "backend",    false);
   int   threads    = prop_int(env, opts, "threads", 0);
 
-  bool vae_decode_only = true;
+  /* Default false: decode-only disables the VAE encoder needed for I2V. */
+  bool vae_decode_only = false;
   js_value_t *vdt;
-  if (js_get_named_property(env, opts, "vae_decode_only", &vdt) == 0) {
-    js_get_value_bool(env, vdt, &vae_decode_only);
+  if (js_get_named_property(env, opts, "vaeDecodeOnly", &vdt) == 0) {
+    js_valuetype_t vt; js_typeof(env, vdt, &vt);
+    if (vt == js_boolean) js_get_value_bool(env, vdt, &vae_decode_only);
   }
 
   sd_ctx_t *sd = ltx2_new_ctx(model, vae, audio_vae, llm, connectors,

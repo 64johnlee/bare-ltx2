@@ -1,0 +1,75 @@
+name: Prebuilds
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  prebuild:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            arch: x64
+            platform: linux
+          - os: macos-14
+            arch: arm64
+            platform: darwin
+          - os: windows-2022
+            arch: x64
+            platform: win32
+
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.platform }}-${{ matrix.arch }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install build tools (Linux)
+        if: matrix.platform == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build
+
+      - name: Install build tools (macOS)
+        if: matrix.platform == 'darwin'
+        run: brew install cmake ninja
+
+      - name: Build prebuild
+        run: npm run build
+
+      - name: Upload prebuild
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuild-${{ matrix.platform }}-${{ matrix.arch }}
+          path: prebuilds/
+
+  merge:
+    needs: prebuild
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all prebuilds
+        uses: actions/download-artifact@v4
+        with:
+          pattern: prebuild-*
+          path: prebuilds/
+          merge-multiple: true
+
+      - name: Upload merged prebuilds
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds
+          path: prebuilds/

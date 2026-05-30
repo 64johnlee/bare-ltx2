@@ -1,0 +1,27 @@
+{
+  "name": "bare-ltx2",
+  "version": "0.1.0",
+  "description": "Bare native addon for LTX-2.3 text-to-video and image-to-video generation",
+  "main": "index.js",
+  "addon": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/64johnlee/bare-ltx2"
+  },
+  "scripts": {
+    "build": "bare-make generate && bare-make build",
+    "test": "bare test.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "bare-make": "^1.0.0",
+    "cmake-bare": "^1.0.0",
+    "cmake-fetch": "^3.0.0",
+    "brittle": "^3.0.0"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  }
+}

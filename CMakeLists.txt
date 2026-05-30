@@ -8,8 +8,8 @@ project(bare_ltx2 C CXX)
 include(cmake-fetch)
 
 cmake_fetch(
-  tetherto/qvac-ext-stable-diffusion.cpp
-  GIT_TAG master
+  64johnlee/qvac-ext-stable-diffusion.cpp
+  GIT_TAG ltx2-video-generation
   SOURCE_DIR deps/stable-diffusion.cpp
 )
 

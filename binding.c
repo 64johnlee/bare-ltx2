@@ -79,6 +79,17 @@ static int prop_int (js_env_t *env, js_value_t *obj,
   return (int)v;
 }
 
+static int64_t prop_int64 (js_env_t *env, js_value_t *obj,
+                            const char *key, int64_t def) {
+  js_value_t *val;
+  if (js_get_named_property(env, obj, key, &val) != 0) return def;
+  js_valuetype_t t;
+  js_typeof(env, val, &t);
+  if (t != js_number) return def;
+  int64_t v; js_get_value_int64(env, val, &v);
+  return v;
+}
+
 /* -----------------------------------------------------------------------
  * ltx2.createContext(opts) → external
  * --------------------------------------------------------------------- */
@@ -227,7 +238,7 @@ static js_value_t *ltx2_gen_t2v (js_env_t *env, js_callback_info_t *info) {
   w->height = prop_int(env, argv[1], "height",  720);
   w->frames = prop_int(env, argv[1], "frames",   33);
   w->fps    = prop_int(env, argv[1], "fps",      24);
-  w->seed   = (int64_t)prop_int(env, argv[1], "seed", -1);
+  w->seed   = prop_int64(env, argv[1], "seed", -1);
 
   js_create_reference(env, argv[2], 1, &w->callback);
 

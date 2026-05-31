@@ -20,6 +20,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install Bare runtime
+        run: npm install --global bare-runtime
+
       - name: Install build tools
         run: sudo apt-get update && sudo apt-get install -y cmake ninja-build
 

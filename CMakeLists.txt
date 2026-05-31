@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 
-find_package(cmake-bare REQUIRED PATHS node_modules/cmake-bare)
-find_package(cmake-fetch REQUIRED PATHS node_modules/cmake-fetch)
+find_package(cmake-bare REQUIRED PATHS ${CMAKE_SOURCE_DIR}/node_modules/cmake-bare)
+find_package(cmake-fetch REQUIRED PATHS ${CMAKE_SOURCE_DIR}/node_modules/cmake-fetch)
 
 project(bare_ltx2 C CXX)
 

@@ -10,7 +10,7 @@
     "url": "https://github.com/64johnlee/bare-ltx2"
   },
   "scripts": {
-    "build": "bare-make generate && bare-make build",
+    "build": "bare-make generate && bare-make build && bare-make install",
     "test": "bare test.js"
   },
   "dependencies": {},

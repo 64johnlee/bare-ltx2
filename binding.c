@@ -7,7 +7,7 @@
 #include <js.h>
 #include <uv.h>
 
-#include "deps/stable-diffusion.cpp/include/ltx2.h"
+#include "ltx2.h"
 
 /* -----------------------------------------------------------------------
  * Internal types

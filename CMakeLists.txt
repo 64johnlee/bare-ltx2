@@ -22,16 +22,16 @@ fetch_package(
 
 add_bare_module(bare_ltx2)
 
-target_sources(bare_ltx2 PRIVATE binding.c)
+target_sources(${bare_ltx2} PRIVATE binding.c)
 
-target_include_directories(bare_ltx2 PRIVATE
+target_include_directories(${bare_ltx2} PRIVATE
   ${sd_source_dir}/include
 )
 
-target_link_libraries(bare_ltx2 PRIVATE stable-diffusion)
+target_link_libraries(${bare_ltx2} PRIVATE stable-diffusion)
 
 if (MSVC)
-  target_compile_options(bare_ltx2 PRIVATE /W0)
+  target_compile_options(${bare_ltx2} PRIVATE /W0)
 else()
-  target_compile_options(bare_ltx2 PRIVATE -w)
+  target_compile_options(${bare_ltx2} PRIVATE -w)
 endif()

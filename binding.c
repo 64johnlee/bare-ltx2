@@ -62,7 +62,7 @@ static char *prop_string (js_env_t *env, js_value_t *obj,
     if (required) js_throw_error(env, NULL, key);
     return NULL;
   }
-  js_valuetype_t t;
+  js_value_type_t t;
   js_typeof(env, val, &t);
   if (t == js_null || t == js_undefined) return NULL;
   return js_to_cstr(env, val);
@@ -72,7 +72,7 @@ static int prop_int (js_env_t *env, js_value_t *obj,
                       const char *key, int def) {
   js_value_t *val;
   if (js_get_named_property(env, obj, key, &val) != 0) return def;
-  js_valuetype_t t;
+  js_value_type_t t;
   js_typeof(env, val, &t);
   if (t != js_number) return def;
   int32_t v; js_get_value_int32(env, val, &v);
@@ -83,7 +83,7 @@ static int64_t prop_int64 (js_env_t *env, js_value_t *obj,
                             const char *key, int64_t def) {
   js_value_t *val;
   if (js_get_named_property(env, obj, key, &val) != 0) return def;
-  js_valuetype_t t;
+  js_value_type_t t;
   js_typeof(env, val, &t);
   if (t != js_number) return def;
   int64_t v; js_get_value_int64(env, val, &v);
@@ -114,7 +114,7 @@ static js_value_t *ltx2_create_context (js_env_t *env,
   bool vae_decode_only = false;
   js_value_t *vdt;
   if (js_get_named_property(env, opts, "vaeDecodeOnly", &vdt) == 0) {
-    js_valuetype_t vt; js_typeof(env, vdt, &vt);
+    js_value_type_t vt; js_typeof(env, vdt, &vt);
     if (vt == js_boolean) js_get_value_bool(env, vdt, &vae_decode_only);
   }
 

@@ -7,24 +7,23 @@ project(bare_ltx2 C CXX)
 
 include(cmake-fetch)
 
-cmake_fetch(
-  64johnlee/qvac-ext-stable-diffusion.cpp
-  GIT_TAG ltx2-video-generation
-  SOURCE_DIR deps/stable-diffusion.cpp
+fetch_package(
+  "github:64johnlee/qvac-ext-stable-diffusion.cpp#ltx2-video-generation"
+  SOURCE_DIR sd_source_dir
 )
 
 set(SD_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(SD_BUILD_EXAMPLES   OFF CACHE BOOL "" FORCE)
 set(SD_BUILD_SERVER     OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(deps/stable-diffusion.cpp EXCLUDE_FROM_ALL)
+add_subdirectory(${sd_source_dir} deps/stable-diffusion.cpp EXCLUDE_FROM_ALL)
 
 add_bare_module(bare_ltx2)
 
 target_sources(bare_ltx2 PRIVATE binding.c)
 
 target_include_directories(bare_ltx2 PRIVATE
-  deps/stable-diffusion.cpp/include
+  ${sd_source_dir}/include
 )
 
 target_link_libraries(bare_ltx2 PRIVATE stable-diffusion)

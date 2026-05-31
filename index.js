@@ -13,7 +13,7 @@ const binding = require('./binding')
  * @param {string}  opts.connectors  Path to embeddings connectors (.safetensors)
  * @param {number}  [opts.threads=0] CPU threads (0 = auto-detect)
  * @param {string}  [opts.backend]   "cpu" | "vulkan" | "metal" | undefined (auto)
- * @param {boolean} [opts.vae_decode_only=true]  Set false to enable I2V VAE encode
+ * @param {boolean} [opts.vaeDecodeOnly=false]  Set true for T2V-only (disables VAE encoder needed for I2V)
  * @returns Opaque context handle — pass to generate* functions, free with freeContext()
  */
 exports.createContext = function createContext (opts) {

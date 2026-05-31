@@ -270,12 +270,18 @@ static js_value_t *ltx2_gen_i2v (js_env_t *env, js_callback_info_t *info) {
   w->height  = prop_int(env, argv[1], "height",      720);
   w->frames  = prop_int(env, argv[1], "frames",       33);
   w->fps     = prop_int(env, argv[1], "fps",          24);
-  w->seed    = (int64_t)prop_int(env, argv[1], "seed", -1);
+  w->seed    = prop_int64(env, argv[1], "seed", -1);
   w->init_w  = prop_int(env, argv[1], "initWidth",  1280);
   w->init_h  = prop_int(env, argv[1], "initHeight",  720);
 
   void *ab_data; size_t ab_len;
   js_get_arraybuffer_info(env, argv[2], &ab_data, &ab_len);
+  size_t expected = (size_t)w->init_w * (size_t)w->init_h * 3;
+  if (ab_len < expected) {
+    free(w->prompt); free(w->neg_prompt); free(w);
+    js_throw_error(env, NULL, "initImage buffer smaller than initWidth*initHeight*3");
+    js_value_t *u; js_get_undefined(env, &u); return u;
+  }
   w->init_data = malloc(ab_len);
   memcpy(w->init_data, ab_data, ab_len);
 

@@ -244,7 +244,7 @@ static js_value_t *ltx2_gen_t2v (js_env_t *env, js_callback_info_t *info) {
 
   js_create_reference(env, argv[2], 1, &w->callback);
 
-  uv_loop_t *loop; js_get_uv_loop(env, &loop);
+  uv_loop_t *loop; js_get_env_loop(env, &loop);
   uv_queue_work(loop, &w->work, gen_execute, gen_done);
 
   js_value_t *u; js_get_undefined(env, &u); return u;
@@ -287,7 +287,7 @@ static js_value_t *ltx2_gen_i2v (js_env_t *env, js_callback_info_t *info) {
 
   js_create_reference(env, argv[3], 1, &w->callback);
 
-  uv_loop_t *loop; js_get_uv_loop(env, &loop);
+  uv_loop_t *loop; js_get_env_loop(env, &loop);
   uv_queue_work(loop, &w->work, gen_execute, gen_done);
 
   js_value_t *u; js_get_undefined(env, &u); return u;

@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  CMAKE_BUILD_PARALLEL_LEVEL: 2
+
 jobs:
   smoke-test:
     runs-on: ubuntu-22.04

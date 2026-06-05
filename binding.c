@@ -64,7 +64,12 @@ static char *prop_string (js_env_t *env, js_value_t *obj,
   }
   js_value_type_t t;
   js_typeof(env, val, &t);
-  if (t == js_null || t == js_undefined) return NULL;
+  if (t == js_null || t == js_undefined) {
+    /* A missing/undefined property lands here (not the get-error path above),
+       so this is where `required` must actually be enforced. */
+    if (required) js_throw_error(env, NULL, key);
+    return NULL;
+  }
   return js_to_cstr(env, val);
 }
 
@@ -116,6 +121,14 @@ static js_value_t *ltx2_create_context (js_env_t *env,
   if (js_get_named_property(env, opts, "vaeDecodeOnly", &vdt) == 0) {
     js_value_type_t vt; js_typeof(env, vdt, &vt);
     if (vt == js_boolean) js_get_value_bool(env, vdt, &vae_decode_only);
+  }
+
+  /* prop_string(...true) has thrown for any missing required path; bail before
+     handing NULLs to ltx2_new_ctx (which would crash in the native layer). */
+  if (!model || !vae || !llm || !connectors) {
+    free(model); free(vae); free(audio_vae);
+    free(llm); free(connectors); free(backend);
+    return NULL;
   }
 
   sd_ctx_t *sd = ltx2_new_ctx(model, vae, audio_vae, llm, connectors,
@@ -183,19 +196,28 @@ static void gen_done (uv_work_t *req, int status) {
     js_get_null(env, &err_arg);
     js_create_object(env, &res_arg);
 
+    /* Report the ACTUAL decoded dimensions — LTX/VAE may round the requested
+       width/height to the VAE factor, so they can differ from w->width/height. */
+    uint32_t out_w = w->out_frames[0].width;
+    uint32_t out_h = w->out_frames[0].height;
+
     js_value_t *tmp;
-    js_create_int32(env, w->width,    &tmp); js_set_named_property(env, res_arg, "width",   tmp);
-    js_create_int32(env, w->height,   &tmp); js_set_named_property(env, res_arg, "height",  tmp);
-    js_create_int32(env, w->n_frames, &tmp); js_set_named_property(env, res_arg, "nFrames", tmp);
+    js_create_int32(env, (int32_t)out_w,  &tmp); js_set_named_property(env, res_arg, "width",   tmp);
+    js_create_int32(env, (int32_t)out_h,  &tmp); js_set_named_property(env, res_arg, "height",  tmp);
+    js_create_int32(env, w->n_frames,     &tmp); js_set_named_property(env, res_arg, "nFrames", tmp);
 
     js_value_t *arr;
     js_create_array_with_length(env, (size_t)w->n_frames, &arr);
-    size_t fbytes = (size_t)w->width * (size_t)w->height * 3;
 
     for (int i = 0; i < w->n_frames; i++) {
+      /* Size each buffer from the frame's OWN dimensions, not the requested
+         size — otherwise a resolution mismatch is an out-of-bounds read. */
+      size_t fbytes = (size_t)w->out_frames[i].width
+                    * (size_t)w->out_frames[i].height
+                    * (size_t)w->out_frames[i].channel;
       void *buf_data; js_value_t *buf;
       js_create_arraybuffer(env, fbytes, &buf_data, &buf);
-      if (w->out_frames[i].data) memcpy(buf_data, w->out_frames[i].data, fbytes);
+      if (w->out_frames[i].data && fbytes) memcpy(buf_data, w->out_frames[i].data, fbytes);
       js_set_element(env, arr, (uint32_t)i, buf);
     }
     js_set_named_property(env, res_arg, "frames", arr);
@@ -234,6 +256,7 @@ static js_value_t *ltx2_gen_t2v (js_env_t *env, js_callback_info_t *info) {
   ltx2_work_t *w = calloc(1, sizeof(ltx2_work_t));
   w->work.data = w; w->env = env; w->ctx = ctx; w->is_i2v = false;
   w->prompt     = prop_string(env, argv[1], "prompt",    true);
+  if (!w->prompt) { free(w); js_value_t *u; js_get_undefined(env, &u); return u; }
   w->neg_prompt = prop_string(env, argv[1], "negPrompt", false);
   if (!w->neg_prompt) w->neg_prompt = strdup("worst quality, low quality, blurry");
   w->width  = prop_int(env, argv[1], "width",  1280);
@@ -264,6 +287,7 @@ static js_value_t *ltx2_gen_i2v (js_env_t *env, js_callback_info_t *info) {
   ltx2_work_t *w = calloc(1, sizeof(ltx2_work_t));
   w->work.data = w; w->env = env; w->ctx = ctx; w->is_i2v = true;
   w->prompt     = prop_string(env, argv[1], "prompt",    true);
+  if (!w->prompt) { free(w); js_value_t *u; js_get_undefined(env, &u); return u; }
   w->neg_prompt = prop_string(env, argv[1], "negPrompt", false);
   if (!w->neg_prompt) w->neg_prompt = strdup("worst quality, low quality, blurry");
   w->width   = prop_int(env, argv[1], "width",      1280);

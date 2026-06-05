@@ -104,6 +104,22 @@ ltx2.generateI2V(ctx, {
 })
 ```
 
+## Example
+
+A runnable end-to-end example lives in [`examples/generate.js`](examples/generate.js):
+
+```sh
+LTX2_MODEL_PATH=/models/ltx2.3-diffusion.gguf \
+LTX2_VAE_PATH=/models/ltx2.3-vae.safetensors \
+LTX2_LLM_PATH=/models/gemma3-encoder.gguf \
+LTX2_CONNECTORS_PATH=/models/ltx2.3-connectors.safetensors \
+bare examples/generate.js
+```
+
+It generates a short clip, reports the returned frame buffers, and includes an
+`ffmpeg` recipe for encoding the raw RGB frames to mp4. With the model env vars
+unset it prints a hint and exits, so it's safe to run without weights.
+
 ## API
 
 ### `createContext(opts)` → `ctx`

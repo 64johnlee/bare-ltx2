@@ -72,3 +72,38 @@ if (!model || !vae || !llm || !connectors) {
     ltx2.freeContext(ctx)
   })
 }
+
+// ---------------------------------------------------------------------------
+// Image-to-video (I2V) — uncomment and adapt once you have an init image.
+//
+// I2V animates a reference image according to the prompt.  The init image
+// must be a packed RGB ArrayBuffer of exactly initWidth * initHeight * 3
+// bytes.  vaeDecodeOnly must be false (the default) because I2V needs the
+// VAE encoder to embed the init frame.
+//
+// Quick way to get a raw RGB buffer from a PNG/JPEG on disk:
+//
+//   const { execSync } = require('bare-subprocess')   // or Node child_process
+//   // ffmpeg decodes to packed RGB24, output to stdout:
+//   const buf = execSync(
+//     'ffmpeg -i init.png -f rawvideo -pix_fmt rgb24 -vframes 1 pipe:1',
+//     { maxBuffer: 20 * 1024 * 1024 }
+//   ).buffer
+//
+// Then call:
+//
+//   ltx2.generateI2V(ctx, {
+//     prompt:      'the cat slowly turns its head',
+//     initWidth:   512,
+//     initHeight:  288,
+//     width:       512,
+//     height:      288,
+//     frames:      25,
+//     fps:         24,
+//     seed:        42,
+//   }, buf, (err, result) => {
+//     if (err) { console.error('I2V failed:', err); ltx2.freeContext(ctx); return }
+//     console.log(`I2V: ${result.nFrames} frames at ${result.width}x${result.height}`)
+//     ltx2.freeContext(ctx)
+//   })
+// ---------------------------------------------------------------------------

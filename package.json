@@ -18,7 +18,7 @@
     "bare-make": "^1.0.0",
     "cmake-bare": "^1.0.0",
     "cmake-fetch": "^1.5.1",
-    "brittle": "^3.0.0"
+    "brittle": "^4.0.2"
   },
   "exports": {
     ".": "./index.js",

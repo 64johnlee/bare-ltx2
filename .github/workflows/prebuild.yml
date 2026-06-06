@@ -30,7 +30,7 @@ jobs:
     name: ${{ matrix.platform }}-${{ matrix.arch }}
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
 
@@ -63,7 +63,7 @@ jobs:
     needs: prebuild
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Download all prebuilds
         uses: actions/download-artifact@v5
